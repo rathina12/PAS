@@ -1,0 +1,417 @@
+{
+  "info": {
+    "name": "Performance Appraisal System — API",
+    "description": "Complete REST API collection for the PAS Pro system.\n\n## How to use\n1. Import this file into Postman\n2. Set the {{base_url}} variable to http://localhost:5000\n3. Run 'Register Admin' first, then 'Login' — the token is saved automatically\n4. All protected routes use the {{token}} variable automatically",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:5000", "type": "string" },
+    { "key": "token",    "value": "",                      "type": "string" },
+    { "key": "manager_id",  "value": "", "type": "string" },
+    { "key": "employee_id", "value": "", "type": "string" },
+    { "key": "appraisal_id","value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "1 — AUTH",
+      "item": [
+        {
+          "name": "Register Admin",
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const res = pm.response.json();",
+              "if (res.token) {",
+              "  pm.collectionVariables.set('token', res.token);",
+              "  console.log('Token saved:', res.token.substring(0,20)+'...');",
+              "}"
+            ], "type": "text/javascript" }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Super Admin\",\n  \"email\": \"admin@company.com\",\n  \"password\": \"admin123\",\n  \"role\": \"admin\",\n  \"department\": \"Management\",\n  \"designation\": \"System Administrator\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/register"
+          }
+        },
+        {
+          "name": "Login",
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const res = pm.response.json();",
+              "if (res.token) {",
+              "  pm.collectionVariables.set('token', res.token);",
+              "  pm.test('Login successful', () => pm.response.to.have.status(200));",
+              "  console.log('Logged in as:', res.user.name, '('+res.user.role+')');",
+              "}"
+            ], "type": "text/javascript" }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@company.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Login as Manager",
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const res = pm.response.json();",
+              "if (res.token) pm.collectionVariables.set('token', res.token);"
+            ], "type": "text/javascript" }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"manager@company.com\",\n  \"password\": \"manager123\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Login as Employee",
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const res = pm.response.json();",
+              "if (res.token) pm.collectionVariables.set('token', res.token);"
+            ], "type": "text/javascript" }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"employee@company.com\",\n  \"password\": \"emp123\"\n}"
+            },
+            "url": "{{base_url}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Get Current User (me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/api/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 — USERS (Admin)",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/api/users"
+          }
+        },
+        {
+          "name": "Get All Users — Filter by Role",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/users?role=employee",
+              "query": [{ "key": "role", "value": "employee" }]
+            }
+          }
+        },
+        {
+          "name": "Create Manager",
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const res = pm.response.json();",
+              "if (res.user) pm.collectionVariables.set('manager_id', res.user._id);"
+            ], "type": "text/javascript" }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Manager\",\n  \"email\": \"manager@company.com\",\n  \"password\": \"manager123\",\n  \"role\": \"manager\",\n  \"department\": \"Engineering\",\n  \"designation\": \"Engineering Manager\"\n}"
+            },
+            "url": "{{base_url}}/api/users"
+          }
+        },
+        {
+          "name": "Create Employee (assigned to manager)",
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const res = pm.response.json();",
+              "if (res.user) pm.collectionVariables.set('employee_id', res.user._id);"
+            ], "type": "text/javascript" }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Employee\",\n  \"email\": \"employee@company.com\",\n  \"password\": \"emp123\",\n  \"role\": \"employee\",\n  \"department\": \"Engineering\",\n  \"designation\": \"Software Engineer\",\n  \"managerId\": \"{{manager_id}}\"\n}"
+            },
+            "url": "{{base_url}}/api/users"
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/api/users/{{employee_id}}"
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Employee Updated\",\n  \"department\": \"Product\",\n  \"designation\": \"Senior Engineer\"\n}"
+            },
+            "url": "{{base_url}}/api/users/{{employee_id}}"
+          }
+        },
+        {
+          "name": "Deactivate User",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/api/users/{{employee_id}}"
+          }
+        },
+        {
+          "name": "Get All Managers",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/api/users/managers"
+          }
+        },
+        {
+          "name": "Get Team (Manager)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/api/users/team"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 — APPRAISALS",
+      "item": [
+        {
+          "name": "Submit Self-Appraisal (Employee)",
+          "event": [{
+            "listen": "test",
+            "script": { "exec": [
+              "const res = pm.response.json();",
+              "if (res.appraisal) pm.collectionVariables.set('appraisal_id', res.appraisal._id);",
+              "pm.test('Status 201', () => pm.response.to.have.status(201));",
+              "pm.test('Has appraisal', () => pm.expect(res.appraisal).to.exist);"
+            ], "type": "text/javascript" }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"period\": \"Q1 2026\",\n  \"year\": 2026,\n  \"selfRatings\": {\n    \"communication\": 4,\n    \"technicalSkills\": 5,\n    \"teamwork\": 4,\n    \"punctuality\": 3,\n    \"leadership\": 4,\n    \"problemSolving\": 5\n  },\n  \"selfComments\": {\n    \"communication\": \"I actively participated in daily standups and wrote clear documentation.\",\n    \"technicalSkills\": \"Delivered 3 major features using React and Node.js.\",\n    \"teamwork\": \"Helped onboard 2 new team members.\",\n    \"punctuality\": \"Met most deadlines; one sprint delayed due to external dependency.\",\n    \"leadership\": \"Led a small sub-team on the payment module.\",\n    \"problemSolving\": \"Resolved critical production bug within 2 hours.\",\n    \"overall\": \"Overall a strong quarter with good technical output and team collaboration.\"\n  }\n}"
+            },
+            "url": "{{base_url}}/api/appraisals"
+          }
+        },
+        {
+          "name": "Get My Appraisals (Employee)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/api/appraisals/my"
+          }
+        },
+        {
+          "name": "Get Team Appraisals (Manager)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/api/appraisals/team"
+          }
+        },
+        {
+          "name": "Get Team Appraisals — Filter Submitted",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/appraisals/team?status=submitted",
+              "query": [{ "key": "status", "value": "submitted" }]
+            }
+          }
+        },
+        {
+          "name": "Get All Appraisals (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/api/appraisals/all"
+          }
+        },
+        {
+          "name": "Get Single Appraisal by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/api/appraisals/{{appraisal_id}}"
+          }
+        },
+        {
+          "name": "Manager Evaluate Appraisal — APPROVE",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"managerRatings\": {\n    \"communication\": 4,\n    \"technicalSkills\": 5,\n    \"teamwork\": 4,\n    \"punctuality\": 4,\n    \"leadership\": 3,\n    \"problemSolving\": 5\n  },\n  \"managerComments\": {\n    \"communication\": \"Clear and concise communicator across the team.\",\n    \"technicalSkills\": \"Excellent technical knowledge, consistently delivers quality code.\",\n    \"teamwork\": \"Great team player, always willing to help colleagues.\",\n    \"punctuality\": \"Meets deadlines regularly, minor delays on one sprint.\",\n    \"leadership\": \"Shows initiative but can improve on delegation.\",\n    \"problemSolving\": \"Exceptional problem solver — resolved critical incidents quickly.\",\n    \"strengths\": \"Strong technical skills, great collaboration, fast learner.\",\n    \"improvements\": \"Should work on delegation and time estimation skills.\",\n    \"overall\": \"John had a strong Q1. His technical contributions and teamwork were outstanding. Recommended for promotion consideration.\"\n  },\n  \"status\": \"approved\"\n}"
+            },
+            "url": "{{base_url}}/api/appraisals/{{appraisal_id}}/evaluate"
+          }
+        },
+        {
+          "name": "Manager Evaluate Appraisal — REJECT",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"managerRatings\": {\n    \"communication\": 2,\n    \"technicalSkills\": 2,\n    \"teamwork\": 3,\n    \"punctuality\": 2,\n    \"leadership\": 2,\n    \"problemSolving\": 3\n  },\n  \"managerComments\": {\n    \"overall\": \"Performance did not meet expectations this quarter. Requires a follow-up review.\",\n    \"strengths\": \"Good attitude towards teamwork.\",\n    \"improvements\": \"Needs significant improvement in technical delivery and punctuality.\"\n  },\n  \"status\": \"rejected\"\n}"
+            },
+            "url": "{{base_url}}/api/appraisals/{{appraisal_id}}/evaluate"
+          }
+        },
+        {
+          "name": "Update Appraisal Status Only",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"under_review\"\n}"
+            },
+            "url": "{{base_url}}/api/appraisals/{{appraisal_id}}/status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4 — REPORTS (Admin)",
+      "item": [
+        {
+          "name": "Get System Summary",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/api/reports/summary"
+          }
+        },
+        {
+          "name": "Get Performance Report (all approved)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/api/reports/performance"
+          }
+        },
+        {
+          "name": "Get Performance Report — Filter by Year",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/reports/performance?year=2026",
+              "query": [{ "key": "year", "value": "2026" }]
+            }
+          }
+        },
+        {
+          "name": "Get Employee Full Report",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/api/reports/employee/{{employee_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5 — NOTIFICATIONS",
+      "item": [
+        {
+          "name": "Get My Notifications",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/api/users/notifications"
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{base_url}}/api/users/notifications/NOTIFICATION_ID_HERE/read"
+          }
+        }
+      ]
+    },
+    {
+      "name": "6 — HEALTH CHECK",
+      "item": [
+        {
+          "name": "Server Health",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/health"
+          }
+        }
+      ]
+    }
+  ]
+}
