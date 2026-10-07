@@ -20,6 +20,6 @@ router.route('/:id')
   .get(getAppraisalById);
 
 router.put('/:id/evaluate', authorize('manager'), evaluateAppraisal);
-router.put('/:id/status',   authorize('manager', 'admin'), updateAppraisalStatus);
+router.put('/:id/status',   authorize('admin'), updateAppraisalStatus);
 
 module.exports = router;
