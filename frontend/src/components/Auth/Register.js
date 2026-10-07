@@ -11,7 +11,7 @@ const Register = () => {
 
   const [form, setForm] = useState({
     name: '', email: '', password: '', confirmPassword: '',
-    role: 'employee', department: '', designation: ''
+    department: '', designation: ''
   });
   const [error,   setError]   = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,7 +24,7 @@ const Register = () => {
   const validate = () => {
     if (!form.name || !form.email || !form.password) return 'All required fields must be filled.';
     if (form.password !== form.confirmPassword)       return 'Passwords do not match.';
-    if (form.password.length < 6)                     return 'Password must be at least 6 characters.';
+    if (form.password.length < 12)                    return 'Password must be at least 12 characters.';
     return null;
   };
 
@@ -39,7 +39,6 @@ const Register = () => {
         name:        form.name,
         email:       form.email,
         password:    form.password,
-        role:        form.role,
         department:  form.department,
         designation: form.designation
       });
@@ -70,7 +69,7 @@ const Register = () => {
       <div className="auth-right" style={{ overflowY: 'auto', padding: '32px 44px' }}>
         <div className="auth-card">
           <h2>Create Account</h2>
-          <p className="subtitle">Fill in the details below to register</p>
+          <p className="subtitle">Create an employee account. Managers and admins are invited by an administrator.</p>
 
           {error && (
             <div style={{
@@ -99,7 +98,7 @@ const Register = () => {
               <div className="form-group">
                 <label className="form-label">Password <span className="required">*</span></label>
                 <input type="password" name="password" className="form-control"
-                  placeholder="Min 6 chars" value={form.password} onChange={handleChange} />
+                  placeholder="Minimum 12 characters" value={form.password} onChange={handleChange} />
               </div>
               <div className="form-group">
                 <label className="form-label">Confirm Password <span className="required">*</span></label>
@@ -109,14 +108,7 @@ const Register = () => {
             </div>
 
             <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Role</label>
-                <select name="role" className="form-control" value={form.role} onChange={handleChange}>
-                  <option value="employee">Employee</option>
-                  <option value="manager">Manager</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
+              
               <div className="form-group">
                 <label className="form-label">Department</label>
                 <input type="text" name="department" className="form-control"
