@@ -17,8 +17,11 @@ const StarRating = ({ value, onChange, disabled }) => {
     <div>
       <div className="stars">
         {[1, 2, 3, 4, 5].map(n => (
-          <span
+          <button type="button"
             key={n}
+            aria-label={`Rate ${n} out of 5`}
+            aria-pressed={value === n}
+            disabled={disabled}
             className={`star ${n <= (hovered || value) ? 'filled' : ''}`}
             onClick={() => !disabled && onChange(n)}
             onMouseEnter={() => !disabled && setHovered(n)}
@@ -26,7 +29,7 @@ const StarRating = ({ value, onChange, disabled }) => {
             title={labels[n]}
           >
             ★
-          </span>
+          </button>
         ))}
       </div>
       <div className="rating-desc">
@@ -46,11 +49,8 @@ const CRITERIA = [
   { key: 'problemSolving',  label: 'Problem Solving',  icon: '🧩', desc: 'Analytical thinking and finding effective solutions' },
 ];
 
-const PERIODS = [
-  'Q1 2025', 'Q2 2025', 'Q3 2025', 'Q4 2025',
-  'Q1 2026', 'Q2 2026', 'Q3 2026', 'Q4 2026',
-  'Annual 2025', 'Annual 2026', 'H1 2025', 'H2 2025'
-];
+const PERIODS = [new Date().getFullYear(), new Date().getFullYear() - 1]
+  .flatMap(year => [`Q1 ${year}`, `Q2 ${year}`, `Q3 ${year}`, `Q4 ${year}`, `H1 ${year}`, `H2 ${year}`, `Annual ${year}`]);
 
 const SelfAppraisal = () => {
   const { user }    = useContext(AuthContext);
