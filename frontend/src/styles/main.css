@@ -910,3 +910,13 @@ tbody tr:hover { background:#faf9ff; }
 @media (prefers-reduced-motion: reduce) {
   *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; scroll-behavior:auto!important; }
 }
+
+/* Responsive navigation */
+.mobile-menu-toggle { display:none; border:1px solid var(--border); background:#fff; color:var(--text-primary); border-radius:10px; width:40px; height:40px; font-size:20px; flex-shrink:0; }
+.mobile-sidebar-backdrop { position:fixed; inset:0; background:rgba(14,16,35,.6); z-index:95; border:0; }
+@media(max-width:768px) {
+  .mobile-menu-toggle { display:inline-flex; align-items:center; justify-content:center; margin-right:12px; }
+  .sidebar { z-index:101; }
+  .header-left { min-width:0; flex:1; }
+  .header-left h1,.header-left p { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+}
