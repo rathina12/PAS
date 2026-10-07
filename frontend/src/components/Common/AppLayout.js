@@ -97,8 +97,11 @@ const AppLayout = () => {
   const navigate           = useNavigate();
   const location           = useLocation();
   const [showNotif, setShowNotif] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const notifRef = useRef(null);
+
+  useEffect(() => { setMobileNavOpen(false); }, [location.pathname]);
 
   // Fetch unread notification count
   useEffect(() => {
@@ -135,7 +138,8 @@ const AppLayout = () => {
     <ToastProvider>
       <div className="app-shell">
         {/* ── Sidebar ── */}
-        <aside className="sidebar">
+        {mobileNavOpen && <button className="mobile-sidebar-backdrop" aria-label="Close navigation" onClick={() => setMobileNavOpen(false)} />}
+        <aside id="pas-navigation" className={`sidebar ${mobileNavOpen ? 'open' : ''}`}>
           <div className="sidebar-brand">
             <h2>PAS Pro</h2>
             <span>Performance Appraisal</span>
@@ -178,6 +182,7 @@ const AppLayout = () => {
         <div className="main-content">
           {/* Top Header */}
           <header className="top-header">
+            <button className="mobile-menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded={mobileNavOpen} aria-controls="pas-navigation" onClick={() => setMobileNavOpen(v => !v)}>☰</button>
             <div className="header-left">
               <h1>{pageTitle}</h1>
               <p>Welcome, {user?.name} · {user?.department}</p>
@@ -186,6 +191,9 @@ const AppLayout = () => {
               <div style={{ position: 'relative' }} ref={notifRef}>
                 <button
                   className="notif-btn"
+                  type="button"
+                  aria-label="Notifications"
+                  aria-expanded={showNotif}
                   onClick={() => setShowNotif(prev => !prev)}
                 >
                   🔔
