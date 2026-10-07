@@ -27,6 +27,10 @@ const sameId = (a, b) => {
 const submitSelfAppraisal = async (req, res) => {
   try {
     const { period, year, selfRatings, selfComments } = req.body;
+    const requiredRatings = ['communication', 'technicalSkills', 'teamwork', 'punctuality', 'leadership', 'problemSolving'];
+    if (!selfRatings || requiredRatings.some(key => !Number.isInteger(selfRatings[key]) || selfRatings[key] < 1 || selfRatings[key] > 5)) {
+      return res.status(400).json({ success: false, message: 'All six self-ratings must be integers between 1 and 5.' });
+    }
 
     if (!period) {
       return res.status(400).json({ success: false, message: 'Appraisal period is required.' });
@@ -195,6 +199,13 @@ const getAppraisalById = async (req, res) => {
 const evaluateAppraisal = async (req, res) => {
   try {
     const { managerRatings, managerComments, status } = req.body;
+    const requiredRatings = ['communication', 'technicalSkills', 'teamwork', 'punctuality', 'leadership', 'problemSolving'];
+    if (!['approved', 'rejected', 'under_review'].includes(status)) {
+      return res.status(400).json({ success: false, message: 'Invalid appraisal decision.' });
+    }
+    if (!managerRatings || requiredRatings.some(key => !Number.isInteger(managerRatings[key]) || managerRatings[key] < 1 || managerRatings[key] > 5)) {
+      return res.status(400).json({ success: false, message: 'All six manager ratings must be integers between 1 and 5.' });
+    }
 
     const appraisal = await Appraisal.findById(req.params.id);
     if (!appraisal) {
@@ -210,7 +221,7 @@ const evaluateAppraisal = async (req, res) => {
     }
 
     // Prevent re-evaluation of already finalised appraisals
-    if (appraisal.status === 'approved' || appraisal.status === 'rejected') {
+    if (!['submitted', 'under_review'].includes(appraisal.status)) {
       return res.status(400).json({
         success: false,
         message: `This appraisal has already been ${appraisal.status}. It cannot be re-evaluated.`
