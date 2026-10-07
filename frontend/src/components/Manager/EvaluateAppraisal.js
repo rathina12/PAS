@@ -22,14 +22,17 @@ const StarRating = ({ value, onChange, disabled }) => {
     <div>
       <div className="stars">
         {[1,2,3,4,5].map(n => (
-          <span
+          <button type="button"
             key={n}
+            aria-label={`Rate ${n} out of 5`}
+            aria-pressed={value === n}
+            disabled={disabled}
             className={`star ${n <= (hovered || value) ? 'filled' : ''}`}
             onClick={() => !disabled && onChange(n)}
             onMouseEnter={() => !disabled && setHovered(n)}
             onMouseLeave={() => !disabled && setHovered(0)}
             title={labels[n]}
-          >★</span>
+          >★</button>
         ))}
       </div>
       <div className="rating-desc">
