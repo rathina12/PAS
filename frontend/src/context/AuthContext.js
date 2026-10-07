@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
   const fetchCurrentUser = useCallback(async () => {
     if (!token) { setLoading(false); return; }
     try {
-     git
+      const res = await axios.get('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } });
       setUser(res.data.user);
     } catch {
       // Token is invalid or expired
