@@ -177,14 +177,10 @@ The browser will automatically open at `http://localhost:3000`
 
 ### STEP 7 — Create Your First Admin Account
 
-1. Open `http://localhost:3000/register` in your browser
-2. Fill in the form:
-   - Name: Your name
-   - Email: admin@company.com
-   - Password: (at least 6 characters)
-   - **Role: Admin** ← Important!
-3. Click "Create Account"
-4. You'll be automatically logged in as Admin
+1. Configure a MongoDB connection in `backend/.env`.
+2. For the **very first** admin only, set `ADMIN_NAME`, `ADMIN_EMAIL` and `ADMIN_PASSWORD` (12+ characters) as environment variables, then run `node scripts/bootstrapAdmin.js` inside `backend/`.
+3. Sign in using those credentials at `http://localhost:3000/login`.
+4. Create further managers/employees from **Manage Users**. Public registration creates employee accounts only.
 
 ---
 
@@ -302,3 +298,10 @@ GET    /api/reports/employee/:id    — Employee history
 | Backend  | Node.js + Express  |
 | Database | MongoDB + Mongoose |
 | Auth     | JWT + bcryptjs     |
+
+
+## Security and UI refresh branch
+
+The `improve/security-and-ui-refresh` branch contains improved design tokens, responsive sidebar navigation, stricter public registration, first-admin bootstrap and a unique employee/period/year index.
+
+**Migration caution:** Before deploying the unique appraisal index, remove or reconcile any existing duplicate employee/period/year records. Test on a staging database before merging. Run frontend build and backend integration checks locally; this branch has not been verified with a live MongoDB environment.
