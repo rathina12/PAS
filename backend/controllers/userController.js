@@ -48,7 +48,11 @@ const getMyTeam = async (req, res) => {
 // @access  Private
 const getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id)
+    const targetId = req.params.id;
+    if (req.user.role !== 'admin' && String(req.user._id) !== targetId && !(req.user.role === 'manager' && await User.exists({ _id: targetId, managerId: req.user._id }))) {
+      return res.status(403).json({ success: false, message: 'Access denied.' });
+    }
+    const user = await User.findById(targetId)
       .populate('managerId', 'name email department');
 
     if (!user) {
@@ -120,6 +124,9 @@ const createUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { name, email, role, department, designation, managerId, isActive } = req.body;
+    if (String(req.user._id) === req.params.id && (isActive === false || (role && role !== 'admin'))) {
+      return res.status(400).json({ success: false, message: 'Cannot deactivate or demote your own admin account.' });
+    }
 
     // Never update password through this route for security
     const updateData = { name, email, role, department, designation, isActive };
@@ -148,6 +155,7 @@ const deleteUser = async (req, res) => {
   try {
     // We soft-delete (deactivate) instead of permanently deleting
     // to preserve appraisal history
+    if (String(req.user._id) === req.params.id) return res.status(400).json({ success: false, message: 'You cannot deactivate your own account.' });
     const user = await User.findByIdAndUpdate(
       req.params.id,
       { isActive: false },
@@ -184,7 +192,12 @@ const getNotifications = async (req, res) => {
 // @access  Private
 const markNotificationRead = async (req, res) => {
   try {
-    await Notification.findByIdAndUpdate(req.params.id, { isRead: true });
+    const notification = await Notification.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user._id },
+      { $set: { isRead: true } },
+      { new: true }
+    );
+    if (!notification) return res.status(404).json({ success: false, message: 'Notification not found.' });
     res.json({ success: true, message: 'Notification marked as read.' });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Failed to update notification.' });
