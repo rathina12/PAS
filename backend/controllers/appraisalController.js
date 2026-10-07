@@ -278,14 +278,15 @@ const updateAppraisalStatus = async (req, res) => {
       });
     }
 
-    const appraisal = await Appraisal.findByIdAndUpdate(
-      req.params.id,
-      { status, reviewedAt: new Date() },
-      { new: true }
+    // Only administrators may use the status override; do not rewrite finalised reviews.
+    const appraisal = await Appraisal.findOneAndUpdate(
+      { _id: req.params.id, status: { $in: ['submitted', 'under_review'] } },
+      { $set: { status, reviewedAt: new Date() } },
+      { new: true, runValidators: true }
     );
 
     if (!appraisal) {
-      return res.status(404).json({ success: false, message: 'Appraisal not found.' });
+      return res.status(404).json({ success: false, message: 'Appraisal not found or already finalised.' });
     }
 
     return res.json({ success: true, message: 'Status updated.', appraisal });
