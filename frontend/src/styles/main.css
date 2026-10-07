@@ -920,3 +920,7 @@ tbody tr:hover { background:#faf9ff; }
   .header-left { min-width:0; flex:1; }
   .header-left h1,.header-left p { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 }
+
+/* Accessible rating buttons */
+button.star { background:transparent; border:0; padding:0 3px; line-height:1.2; }
+button.star:disabled { cursor:not-allowed; }
