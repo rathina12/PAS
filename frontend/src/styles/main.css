@@ -814,3 +814,99 @@ tbody tr:hover         { background: #f8fafc; }
   .page-body     { padding: 16px; }
   .stats-grid    { grid-template-columns: repeat(2, 1fr); }
 }
+
+
+/* PAS Pro 2.0 — visual refresh, compatible with existing components */
+:root {
+  --primary: #6558e8;
+  --primary-dark: #4f40d3;
+  --primary-light: #f0eeff;
+  --secondary: #168c79;
+  --secondary-light: #e7f7f2;
+  --accent: #e08b45;
+  --accent-light: #fff3e8;
+  --bg: #f7f8fc;
+  --bg-sidebar: #17172e;
+  --bg-sidebar2: #22233f;
+  --text-primary: #20223a;
+  --text-secondary: #666d84;
+  --text-muted: #8e95aa;
+  --border: #e7e8f1;
+  --border-focus: #6558e8;
+  --radius-sm: 10px;
+  --radius: 13px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --shadow-sm: 0 2px 8px rgba(33,36,66,.035);
+  --shadow: 0 12px 32px rgba(33,36,66,.065);
+  --shadow-lg: 0 24px 64px rgba(33,36,66,.16);
+  --font-body: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: var(--font-body);
+  --sidebar-w: 250px;
+  --header-h: 82px;
+}
+body { letter-spacing: -.012em; }
+.sidebar { background: linear-gradient(165deg,#1e2041,#141529 72%); }
+.sidebar-brand { padding-top: 32px; padding-bottom: 28px; }
+.sidebar-brand h2 { font-size: 23px; font-weight: 800; letter-spacing: -.05em; }
+.sidebar-nav { padding: 18px 12px; }
+.nav-section-label { padding: 19px 15px 9px; color:#8589ab; }
+.nav-item {
+  border: 0;
+  border-radius: 11px;
+  padding: 12px 14px;
+  margin: 3px 0;
+  color: #b5b8d0;
+}
+.nav-item:hover { background:rgba(255,255,255,.075); color:white; }
+.nav-item.active { background:rgba(137,124,255,.19); color:#fff; border-left:0; box-shadow:inset 3px 0 0 #9a90ff; }
+.sidebar-avatar { background:linear-gradient(135deg,#8e81ff,#5e55d9); box-shadow:0 8px 18px rgba(75,62,190,.3); }
+.sidebar-user { padding: 20px; }
+.top-header { border-bottom: 1px solid #eff0f6; box-shadow: 0 2px 16px rgba(30,33,70,.025); }
+.header-left h1 { font-size: 22px; font-weight: 750; letter-spacing: -.04em; }
+.header-left p { font-size: 13px; margin-top: 2px; }
+.page-body { max-width: 1540px; padding: 35px 38px 60px; }
+.card,.stat-card { border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.card { border-radius: 20px; overflow:hidden; }
+.stat-card { border-radius: 18px; padding: 25px; transition:transform .2s ease,box-shadow .2s ease; }
+.stat-card:hover { transform:translateY(-3px);box-shadow:var(--shadow); }
+.stat-value { letter-spacing:-.055em; }
+.stat-icon { border-radius:14px; }
+.btn { font-weight:650; border-radius:11px; min-height:38px; }
+.btn-primary { box-shadow:0 6px 18px rgba(101,88,232,.2); }
+.btn-primary:hover:not(:disabled) { transform:translateY(-1px); }
+.form-control { background:#fff; border-radius:11px; padding:12px 14px; }
+.form-control:focus { box-shadow:0 0 0 4px rgba(101,88,232,.12); }
+table { border-collapse:separate; border-spacing:0; }
+thead th { background:#fafaff; letter-spacing:.075em; }
+tbody tr:hover { background:#faf9ff; }
+.badge { padding:5px 11px; font-weight:700; }
+.score-bar-track { background:#eeedf8; }
+.score-bar-fill { background:linear-gradient(90deg,#7268ed,#a59bff); }
+:where(button,a,input,select,textarea):focus-visible { outline:3px solid #a49cfc; outline-offset:3px; }
+@media (max-width: 1100px) {
+  .page-body { padding:25px 22px 45px; }
+  .stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 760px) {
+  .page-body { padding:20px 14px 40px; }
+  .top-header { padding:12px 16px; min-height:70px; height:auto; }
+  .header-left h1 { font-size:18px; }
+  .header-left p { font-size:11px; }
+  .stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px; }
+  .stat-card { padding:15px; gap:10px; }
+  .stat-icon { width:36px; height:36px; font-size:18px; }
+  .stat-value { font-size:22px; }
+  .stat-label { font-size:11px; }
+  .card-body { padding:16px; }
+  .notif-panel { right:-10px; width:min(340px,calc(100vw - 30px)); }
+}
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns:1fr 1fr; }
+  .form-row { grid-template-columns:1fr; gap:0; }
+  .modal-overlay { padding:10px; }
+  .modal-body { padding:16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; scroll-behavior:auto!important; }
+}
