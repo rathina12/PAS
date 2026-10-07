@@ -19,10 +19,20 @@ const generateToken = (userId) => {
 // @access  Public
 const register = async (req, res) => {
   try {
-    const { name, email, password, role, department, designation } = req.body;
+    const { name, email, password, department, designation } = req.body;
+
+    // Public sign-up must never grant privileged roles. Managers/admins are
+    // provisioned by an authenticated administrator instead.
+    if (!name || !email || !password) {
+      return res.status(400).json({ success: false, message: 'Name, email and password are required.' });
+    }
+    if (password.length < 12) {
+      return res.status(400).json({ success: false, message: 'Password must contain at least 12 characters.' });
+    }
+    const normalizedEmail = email.trim().toLowerCase();
 
     // Check if email already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -33,9 +43,9 @@ const register = async (req, res) => {
     // Create the new user
     const user = await User.create({
       name,
-      email,
+      email: normalizedEmail,
       password,
-      role:        role || 'employee',
+      role:        'employee',
       department:  department || 'General',
       designation: designation || 'Staff'
     });
@@ -82,7 +92,7 @@ const login = async (req, res) => {
     }
 
     // Find user and explicitly include password (select: false by default)
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email: String(email).trim().toLowerCase() }).select('+password');
 
     if (!user) {
       return res.status(401).json({
