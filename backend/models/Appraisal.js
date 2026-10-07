@@ -96,6 +96,9 @@ const AppraisalSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
+// Prevent duplicate submissions even when requests arrive concurrently.
+AppraisalSchema.index({ employeeId: 1, period: 1, year: 1 }, { unique: true });
+
 // ── Static: Calculate average score from a ratings object ───
 // Uses explicit RATING_KEYS to avoid Mongoose internal properties
 AppraisalSchema.statics.calculateScore = function (ratingsObj) {
