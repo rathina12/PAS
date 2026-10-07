@@ -32,11 +32,16 @@ const submitSelfAppraisal = async (req, res) => {
       return res.status(400).json({ success: false, message: 'All six self-ratings must be integers between 1 and 5.' });
     }
 
-    if (!period) {
+    if (typeof period !== 'string' || !period.trim()) {
       return res.status(400).json({ success: false, message: 'Appraisal period is required.' });
     }
 
-    const appraisalYear = year || new Date().getFullYear();
+    // The current UI embeds the year in the period label (e.g. Q3 2026).
+    const yearFromPeriod = /(?:^|\\s)(20\\d{2})$/.exec(period)?.[1];
+    const appraisalYear = yearFromPeriod ? Number(yearFromPeriod) : (year || new Date().getFullYear());
+    if (!Number.isInteger(appraisalYear) || appraisalYear < 2000 || appraisalYear > 2100) {
+      return res.status(400).json({ success: false, message: 'Invalid appraisal year.' });
+    }
 
     // Check if one already exists for this period/year
     const existing = await Appraisal.findOne({
@@ -95,6 +100,7 @@ const submitSelfAppraisal = async (req, res) => {
     });
   } catch (err) {
     console.error('submitSelfAppraisal error:', err);
+    if (err.code === 11000) return res.status(409).json({ success: false, message: 'An appraisal already exists for this period.' });
     return res.status(500).json({ success: false, message: 'Server error during submission.' });
   }
 };
